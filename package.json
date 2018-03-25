@@ -1,0 +1,46 @@
+{
+  "name": "react-dom-input-fields",
+  "version": "1.0.0",
+  "description": "ReactJS Library for user input fields (form fields) made especially for web views.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest",
+    "build": "rm -rf build && babel src --out-dir build",
+    "build-dev": "rm -rf dev/src/build && babel src --out-dir dev/src/build",
+    "build-dev-watch": "rm -rf dev/src/build && babel src --out-dir dev/src/build --watch",
+    "build-all": "npm run build && npm run build-dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aprilmintacpineda/react-dom-input-fields.git"
+  },
+  "keywords": [
+    "react-js",
+    "react",
+    "forms",
+    "user",
+    "input",
+    "form",
+    "fields",
+    "web",
+    "forms"
+  ],
+  "author": "April Mintac Pineda",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aprilmintacpineda/react-dom-input-fields/issues"
+  },
+  "homepage": "https://github.com/aprilmintacpineda/react-dom-input-fields#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-export-extensions": "^6.22.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1"
+  },
+  "dependencies": {
+    "prop-types": "^15.6.1",
+    "smart-input-validator": "^1.1.8"
+  }
+}
