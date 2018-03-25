@@ -40,10 +40,13 @@ var TextField = function (_Component) {
     _this.randomNumber = _this.randomNumber.bind(_this);
     _this.showOptions = _this.showOptions.bind(_this);
     _this.inputValueChange = _this.inputValueChange.bind(_this);
+    _this.handleArrowPress = _this.handleArrowPress.bind(_this);
+    _this.clearSelectedOptionIndex = _this.clearSelectedOptionIndex.bind(_this);
 
     _this.state = {
       optionsVisible: false,
-      inputValue: _this.props.value
+      inputValue: _this.props.value,
+      selectedOptionIndex: null
     };
     return _this;
   }
@@ -77,7 +80,9 @@ var TextField = function (_Component) {
       });
 
       return this.setState(_extends({}, this.state, {
-        inputValue: inputValue
+        inputValue: inputValue,
+        optionsVisible: false,
+        selectedOptionIndex: null
       }), this.props.onChange(inputValue, errors));
     }
   }, {
@@ -93,6 +98,13 @@ var TextField = function (_Component) {
     key: 'randomNumber',
     value: function randomNumber() {
       return Math.floor(Math.random() * (999999 - 111111)) + 111111;
+    }
+  }, {
+    key: 'clearSelectedOptionIndex',
+    value: function clearSelectedOptionIndex() {
+      return this.setState(_extends({}, this.state, {
+        selectedOptionIndex: null
+      }));
     }
   }, {
     key: 'showOptions',
@@ -117,25 +129,85 @@ var TextField = function (_Component) {
         return option.constructor == Object ? _react2.default.createElement(
           'li',
           { key: i },
-          _react2.default.createElement(
+          _this2.state.selectedOptionIndex == i ? _react2.default.createElement(
             'a',
-            { onMouseDown: function onMouseDown() {
+            {
+              className: 'onlink',
+              onMouseDown: function onMouseDown() {
                 return _this2.valueChanged(option.value);
-              } },
+              },
+              onMouseOver: _this2.clearSelectedOptionIndex
+            },
+            option.label
+          ) : _react2.default.createElement(
+            'a',
+            {
+              onMouseDown: function onMouseDown() {
+                return _this2.valueChanged(option.value);
+              },
+              onMouseOver: _this2.clearSelectedOptionIndex
+            },
             option.label
           )
         ) : _react2.default.createElement(
           'li',
           { key: i },
-          _react2.default.createElement(
+          _this2.state.selectedOptionIndex == i ? _react2.default.createElement(
             'a',
-            { onMouseDown: function onMouseDown() {
+            {
+              className: 'onlink',
+              onMouseDown: function onMouseDown() {
                 return _this2.valueChanged(option);
-              } },
+              },
+              onMouseOver: _this2.clearSelectedOptionIndex
+            },
+            option
+          ) : _react2.default.createElement(
+            'a',
+            {
+              onMouseDown: function onMouseDown() {
+                return _this2.valueChanged(option);
+              },
+              onMouseOver: _this2.clearSelectedOptionIndex
+            },
             option
           )
         );
       });
+    }
+  }, {
+    key: 'handleArrowPress',
+    value: function handleArrowPress(keyCode) {
+      if (keyCode == 38) {
+        // arrow up
+        if (this.state.selectedOptionIndex === null || this.state.selectedOptionIndex < 1) {
+          return this.setState(_extends({}, this.state, {
+            selectedOptionIndex: this.props.options.length - 1,
+            optionsVisible: true
+          }));
+        }
+
+        return this.setState(_extends({}, this.state, {
+          selectedOptionIndex: this.state.selectedOptionIndex - 1,
+          optionsVisible: true
+        }));
+      } else if (keyCode == 40) {
+        // arrow down
+        if (this.state.selectedOptionIndex === null || this.state.selectedOptionIndex >= this.props.options.length - 1) {
+          return this.setState(_extends({}, this.state, {
+            selectedOptionIndex: 0,
+            optionsVisible: true
+          }));
+        }
+
+        return this.setState(_extends({}, this.state, {
+          selectedOptionIndex: this.state.selectedOptionIndex + 1,
+          optionsVisible: true
+        }));
+      } else if (keyCode == 13) {
+        // enter
+        return this.valueChanged(this.props.options[this.state.selectedOptionIndex]);
+      }
     }
   }, {
     key: 'render',
@@ -164,6 +236,9 @@ var TextField = function (_Component) {
                 inputValue: _this3.props.value
               }));
             },
+            onKeyDown: function onKeyDown(keyPressEvent) {
+              return _this3.handleArrowPress(keyPressEvent.keyCode);
+            },
             value: this.state.inputValue,
             onChange: function onChange(changeEvent) {
               return _this3.inputValueChange(changeEvent.target.value);
@@ -190,7 +265,7 @@ var TextField = function (_Component) {
         _react2.default.createElement(
           'style',
           null,
-          '\n            .' + inputWrapperClassName + ' {\n              position: relative;\n              display: inline-block;\n            }\n            .' + inputWrapperClassName + ':after {\n              content: \'\';\n              position: absolute;\n              width: 0;\n              height: 0;\n              border-left: 5px solid transparent;\n              border-right: 5px solid transparent;\n              border-top: 5px solid #000000;\n              top: 50%;\n              right: 5px;\n              transform: translate(0, -50%);\n              z-index: 1;\n            }\n            .' + inputWrapperClassName + ' input {\n              padding-right: 15px;\n            }\n            .' + optionsWrapperClassName + ' {\n              display: ' + (this.state.optionsVisible ? 'block' : 'none') + ';\n              position: absolute;\n              left: 0;\n              right: 0;\n              top: 100%;\n              border: 1px solid #d0d1d5;\n              maxHeight: ' + (this.props.optionsWrapperMaxHeight ? this.props.optionsWrapperMaxHeight + 'px' : '200px') + ';\n              overflowY: auto;\n              margin: 0;\n              padding: 0;\n              z-index: 1;\n              background: #ffffff;\n            }\n            .' + optionsWrapperClassName + ' li {\n              list-style: none;\n              border-bottom: 1px solid #d0d1d5;\n            }\n            .' + optionsWrapperClassName + ' li:last-child {\n              border-bottom: 0;\n            }\n            .' + optionsWrapperClassName + ' li a {\n              display: block;\n            }\n            .' + optionsWrapperClassName + ' li a:hover {\n              cursor: pointer;\n              background: #d0d1d5;\n              color: #ffffff;\n            }\n          '
+          '\n            .' + inputWrapperClassName + ' {\n              position: relative;\n              display: inline-block;\n            }\n            .' + inputWrapperClassName + ':after {\n              content: \'\';\n              position: absolute;\n              width: 0;\n              height: 0;\n              border-left: 5px solid transparent;\n              border-right: 5px solid transparent;\n              border-top: 5px solid #000000;\n              top: 50%;\n              right: 5px;\n              transform: translate(0, -50%);\n              z-index: 1;\n            }\n            .' + inputWrapperClassName + ' input {\n              padding-right: 15px;\n            }\n            .' + optionsWrapperClassName + ' {\n              display: ' + (this.state.optionsVisible ? 'block' : 'none') + ';\n              position: absolute;\n              left: 0;\n              right: 0;\n              top: 100%;\n              border: 1px solid #d0d1d5;\n              maxHeight: ' + (this.props.optionsWrapperMaxHeight ? this.props.optionsWrapperMaxHeight + 'px' : '200px') + ';\n              overflowY: auto;\n              margin: 0;\n              padding: 0;\n              z-index: 1;\n              background: #ffffff;\n            }\n            .' + optionsWrapperClassName + ' li {\n              list-style: none;\n              border-bottom: 1px solid #d0d1d5;\n            }\n            .' + optionsWrapperClassName + ' li:last-child {\n              border-bottom: 0;\n            }\n            .' + optionsWrapperClassName + ' li a {\n              display: block;\n            }\n            .' + optionsWrapperClassName + ' li .onlink {\n              background: #d0d1d5;\n              color: #ffffff;\n            }\n            .' + optionsWrapperClassName + ' li a:hover {\n              cursor: pointer;\n              background: #d0d1d5;\n              color: #ffffff;\n            }\n          '
         )
       );
     }

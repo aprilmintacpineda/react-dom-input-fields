@@ -43,14 +43,17 @@ export default class TextField extends Component {
     this.randomNumber = this.randomNumber.bind(this);
     this.showOptions = this.showOptions.bind(this);
     this.inputValueChange = this.inputValueChange.bind(this);
+    this.handleArrowPress = this.handleArrowPress.bind(this);
+    this.clearSelectedOptionIndex = this.clearSelectedOptionIndex.bind(this);
 
     this.state = {
       optionsVisible: false,
-      inputValue: this.props.value
+      inputValue: this.props.value,
+      selectedOptionIndex: null
     };
   }
 
-  valueChanged(inputValue) {
+  valueChanged(inputValue = '') {
     let rules;
 
     if (this.props.required) {
@@ -78,7 +81,9 @@ export default class TextField extends Component {
 
     return this.setState({
       ...this.state,
-      inputValue
+      inputValue,
+      optionsVisible: false,
+      selectedOptionIndex: null
     }, this.props.onChange(inputValue, errors));
   }
 
@@ -93,6 +98,13 @@ export default class TextField extends Component {
 
   randomNumber() {
     return Math.floor(Math.random() * (999999 - 111111)) + 111111;
+  }
+
+  clearSelectedOptionIndex() {
+    return this.setState({
+      ...this.state,
+      selectedOptionIndex: null
+    });
   }
 
   showOptions() {
@@ -113,12 +125,81 @@ export default class TextField extends Component {
     return options.map((option, i) =>
       option.constructor == Object
       ? <li key={i}>
-          <a onMouseDown={() => this.valueChanged(option.value)}>{option.label}</a>
+          {
+            this.state.selectedOptionIndex == i
+            ? <a
+                className="onlink"
+                onMouseDown={() => this.valueChanged(option.value)}
+                onMouseOver={this.clearSelectedOptionIndex}
+              >
+                {option.label}
+              </a>
+            : <a
+                onMouseDown={() => this.valueChanged(option.value)}
+                onMouseOver={this.clearSelectedOptionIndex}
+              >
+                {option.label}
+              </a>
+          }
         </li>
       : <li key={i}>
-          <a onMouseDown={() => this.valueChanged(option)}>{option}</a>
+          {
+            this.state.selectedOptionIndex == i
+            ? <a
+                className="onlink"
+                onMouseDown={() => this.valueChanged(option)}
+                onMouseOver={this.clearSelectedOptionIndex}
+              >
+                {option}
+              </a>
+            : <a
+                onMouseDown={() => this.valueChanged(option)}
+                onMouseOver={this.clearSelectedOptionIndex}
+              >
+                {option}
+              </a>
+          }
         </li>
     );
+  }
+
+  handleArrowPress(keyCode) {
+    if (keyCode == 38) {
+      // arrow up
+      if (this.state.selectedOptionIndex === null
+       || this.state.selectedOptionIndex < 1) {
+        return this.setState({
+          ...this.state,
+          selectedOptionIndex: this.props.options.length - 1,
+          optionsVisible: true
+        });
+      }
+
+      return this.setState({
+        ...this.state,
+        selectedOptionIndex: this.state.selectedOptionIndex - 1,
+        optionsVisible: true
+      });
+    } else if (keyCode == 40) {
+      // arrow down
+      if (this.state.selectedOptionIndex === null
+       || this.state.selectedOptionIndex >= this.props.options.length - 1) {
+        return this.setState({
+          ...this.state,
+          selectedOptionIndex: 0,
+          optionsVisible: true
+        });
+      }
+
+      return this.setState({
+        ...this.state,
+        selectedOptionIndex: this.state.selectedOptionIndex + 1,
+        optionsVisible: true
+      });
+    } else if (keyCode == 13) {
+      // enter
+      this.valueChanged(this.props.options[this.state.selectedOptionIndex]);
+    }
   }
 
   render() {
@@ -137,8 +218,10 @@ export default class TextField extends Component {
             onBlur={() => this.setState({
               ...this.state,
               optionsVisible: false,
-              inputValue: this.props.value
+              inputValue: this.props.value,
+              selectedOptionIndex: null
             })}
+            onKeyDown={keyPressEvent => this.handleArrowPress(keyPressEvent.keyCode)}
             value={this.state.inputValue}
             onChange={changeEvent => this.inputValueChange(changeEvent.target.value)}
           />
@@ -203,6 +286,10 @@ export default class TextField extends Component {
             }
             .${optionsWrapperClassName} li a {
               display: block;
+            }
+            .${optionsWrapperClassName} li .onlink {
+              background: #d0d1d5;
+              color: #ffffff;
             }
             .${optionsWrapperClassName} li a:hover {
               cursor: pointer;
