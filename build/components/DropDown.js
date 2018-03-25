@@ -53,7 +53,9 @@ var TextField = function (_Component) {
 
   _createClass(TextField, [{
     key: 'valueChanged',
-    value: function valueChanged(inputValue) {
+    value: function valueChanged() {
+      var inputValue = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+
       var rules = void 0;
 
       if (this.props.required) {
@@ -91,7 +93,9 @@ var TextField = function (_Component) {
       if (!inputValue) return this.valueChanged('');
 
       return this.setState(_extends({}, this.state, {
-        inputValue: inputValue
+        inputValue: inputValue,
+        selectedOptionIndex: null,
+        optionsVisible: true
       }));
     }
   }, {
@@ -206,7 +210,7 @@ var TextField = function (_Component) {
         }));
       } else if (keyCode == 13) {
         // enter
-        return this.valueChanged(this.props.options[this.state.selectedOptionIndex]);
+        this.valueChanged(this.props.options[this.state.selectedOptionIndex]);
       }
     }
   }, {
@@ -233,7 +237,8 @@ var TextField = function (_Component) {
             onBlur: function onBlur() {
               return _this3.setState(_extends({}, _this3.state, {
                 optionsVisible: false,
-                inputValue: _this3.props.value
+                inputValue: _this3.props.value,
+                selectedOptionIndex: null
               }));
             },
             onKeyDown: function onKeyDown(keyPressEvent) {

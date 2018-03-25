@@ -92,7 +92,9 @@ export default class TextField extends Component {
 
     return this.setState({
       ...this.state,
-      inputValue
+      inputValue,
+      selectedOptionIndex: null,
+      optionsVisible: true
     });
   }
 
